@@ -4,11 +4,15 @@ import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class TableController {
@@ -18,6 +22,9 @@ public class TableController {
 
     @FXML
     private TableColumn<Question, String> questionText;
+
+    @FXML
+    private TableColumn<Question, Image> questionImage;
 
     @FXML
     private TableView<Question> tblQuestions;
@@ -40,7 +47,7 @@ public class TableController {
             return;
         }
 
-        Question newQuestion = new Question(nextQuestionId++, newText);
+        Question newQuestion = new Question(nextQuestionId++, newText, "default.png");
         questions.add(newQuestion);
         txtQuestion.clear();
         lblMessage.setVisible(false);
@@ -62,11 +69,29 @@ public class TableController {
     void initialize() {
         questionID.setCellValueFactory(new PropertyValueFactory<>("id"));
         questionText.setCellValueFactory(new PropertyValueFactory<>("text"));
+        questionImage.setCellValueFactory(new PropertyValueFactory<>("image"));
+        questionImage.setCellFactory(p -> new TableCell<>() {
+            @Override
+            public void updateItem(Image image, boolean empty) {
+                super.updateItem(image, empty);
+                if (image != null && !empty) {
+                    final ImageView imageview = new ImageView();
+                    imageview.setFitHeight(50);
+                    imageview.setFitWidth(50);
+                    imageview.setImage(image);
+                    setGraphic(imageview);
+                    setAlignment(Pos.CENTER);
+                } else {
+                    setGraphic(null);
+                    setText(null);
+                }
+            }
+        });
 
         questions = FXCollections.observableArrayList(
-                new Question(1, "What is Java?"),
-                new Question(2, "What is JavaFX?"),
-                new Question(3, "What is a TableView?")
+                new Question(1, "What is the capital of France?", "france.png"),
+                new Question(2, "What is the capital of Germany?", "germany.png"),
+                new Question(3, "What is the capital of Italy?", "italy.png")
         );
         nextQuestionId = questions.stream()
             .mapToInt(Question::getId)
